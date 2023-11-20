@@ -1,0 +1,92 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #000;
+    color: #00ff00; /* green text color */
+    font-family: 'Courier New', monospace;
+    position: relative;
+}
+
+.terminal {
+    background-color: #000;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #00ff00;
+    width: 100%; /* Updated width to 100% */
+    max-width: 100%; /* Set a maximum width if desired */
+    height: 100vh; /* Set height to full viewport height */
+    overflow: auto; /* Add overflow for scrolling */
+    box-sizing: border-box; /* Include padding and border in the total width/height */
+    position: relative;
+    z-index: 1; /* Ensure the terminal content appears on top of the pseudo-elements */
+}
+
+#output, #commandInput, .prompt {
+    animation: glow 1s infinite alternate; /* Glowing animation */
+}
+
+.input-line {
+    display: flex;
+    align-items: center;
+}
+
+#commandInput {
+    border: none;
+    background-color: transparent;
+    color: #00ff00; /* green text color */
+    font-family: 'Courier New', monospace;
+    width: 100%;
+    outline: none;
+}
+
+.prompt {
+    color: #00ff00;
+    margin-right: 5px;
+}
+
+.terminal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(180deg, transparent, transparent 1px, rgba(255, 255, 255, 0.1) 1px, rgba(255, 255, 255, 0.1) 2px);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.terminal::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.02);
+    pointer-events: none;
+    z-index: -1;
+    animation: flicker 2s infinite;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+    }
+    to {
+        text-shadow: 0 0 15px #00ff00, 0 0 25px #00ff00, 0 0 35px #00ff00;
+    }
+}
+
+@keyframes flicker {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
