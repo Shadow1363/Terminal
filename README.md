@@ -1,6 +1,8 @@
 # terminal
 A simple Linux Terminal Themed - Portfolio Website
 
+See it in action here: https://shadow1363.github.io/terminal/
+
 Feel free to leave a pull request or an issue, thanks.
 
 # planned features
@@ -10,7 +12,6 @@ Feel free to leave a pull request or an issue, thanks.
 - cleaner and neater code
 - reworked addToOutput
 - redirect commands
-- have github page
 
 # resource
 https://manytools.org/hacker-tools/ascii-banner/
