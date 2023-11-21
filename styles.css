@@ -24,8 +24,13 @@ body {
     position: relative;
     z-index: 1; /* Ensure the terminal content appears on top of the pseudo-elements */
 }
-
-#output, #commandInput, .prompt {
+.terminal div {
+    overflow: hidden;
+    text-overflow: ellipsis; /* or any other value, e.g., 'clip' */
+    white-space: nowrap;
+    
+}
+#output, input#commandInput, .prompt {
     animation: glow 1s infinite alternate; /* Glowing animation */
 }
 

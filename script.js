@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const output = document.getElementById('output');
     const input = document.getElementById('commandInput');
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let animationEnabled = true;
 
     function playKeyboardSound() {
         const oscillator = audioContext.createOscillator();
@@ -36,112 +37,158 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
     function processCommand(command) {
-        switch (command.trim()) {
-            case 'about':
-            case 'aboutme':
-            case 'aboutme.txt':
-                addToOutput(body[0].aboutme);
-                break;
-            case 'cv': 
-            case 'cv.txt':
-                clearOutput();
-                loadAndDisplayFile('cv.txt');
-                break;
-            case 'previouswork.txt':
-            case 'previouswork':
-            case 'pre':
-                addToOutput('Previous Work:');
-                for (const company in body[0].previouswork) {
-                    if (body[0].previouswork.hasOwnProperty(company)) {
-                        addToOutput(`${company}: ${body[0].previouswork[company]}`);
+        const trimmedCommand = command.trim().toLowerCase();
+    
+        // Check if the command starts with "color"
+        if (trimmedCommand.startsWith('color')) {
+            // Extract the color value from the command
+            const colorValue = trimmedCommand.split(' ')[1];
+    
+            if(colorValue === "reset"){
+                changeTerminalColor("#00ff00");
+                addToOutput(`Color was reset.`);
+            }
+            else if (isValidColor(colorValue)) {
+                changeTerminalColor(colorValue);
+                addToOutput(`Color changed to: ${colorValue}`);
+            } else {
+                addToOutput('Invalid color input. Please enter a valid hex code.');
+            }
+        } else {
+            // Handle other commands...
+            switch (trimmedCommand) {
+                case 'about':
+                case 'aboutme':
+                case 'aboutme.txt':
+                    addToOutput(body[0].aboutme);
+                    break;
+                case 'cv':
+                case 'cv.txt':
+                    clearOutput();
+                    loadAndDisplayFile('cv.txt');
+                    break;
+                case 'previouswork.txt':
+                case 'previouswork':
+                case 'pre':
+                    addToOutput('Previous Work:');
+                    for (const company in body[0].previouswork) {
+                        if (body[0].previouswork.hasOwnProperty(company)) {
+                            addToOutput(`${company}: ${body[0].previouswork[company]}`);
+                        }
                     }
-                }
-                break;
-            case 'contact':
-            case 'contact.txt':
-                addToOutput('Contact Information:');
-                for (const method in body[0].contact) {
-                    if (body[0].contact.hasOwnProperty(method)) {
-                        addToOutput(`${method}: ${body[0].contact[method]}`);
+                    break;
+                case 'contact':
+                case 'contact.txt':
+                    addToOutput('Contact Information:');
+                    for (const method in body[0].contact) {
+                        if (body[0].contact.hasOwnProperty(method)) {
+                            addToOutput(`${method}: ${body[0].contact[method]}`);
+                        }
                     }
-                }
-                break;
-            case 'help':
-                addToOutput(`ls: List directories\nclear: Clear screen`);
-                break;
-            case 'ls':
-                displayBodyContents();
-                break;
-            case 'clear':
-            case 'cls':
-                clearOutput();
-                break;
-            case '':
-                addToOutput(``);
-                break;
-            default:
-                addToOutput('Command not found: ' + command);
+                    break;
+                case 'help':
+                    addToOutput(`ls: List directories
+clear: Clear screen
+color #hexcode: Change display color
+anim: Toggle animation`);
+                    break;
+                case 'ls':
+                    displayBodyContents();
+                    break;
+                case 'anim':
+                case 'animation':
+                    if (animationEnabled){
+                        animationEnabled = false
+                        addToOutput("Text is no longer animated.")
+                    } else {
+                        animationEnabled = true
+                        addToOutput("Text is animated.")
+                    };
+                    break;
+                case 'clear':
+                case 'cls':
+                    clearOutput();
+                    break;
+                case '':
+                    addToOutput(``);
+                    break;
+                default:
+                    addToOutput('Command not found: ' + trimmedCommand);
+            }
         }
     }
 
     function addToOutput(text) {
-        // Split the text into lines
-        const lines = text.split('\n');
+        const output = document.getElementById('output');
     
-        // Calculate the maximum width of the terminal
-        const maxWidth = output.clientWidth;
-    
-        // Process each line
-        lines.forEach(line => {
-            // Split the line into chunks that fit within the terminal width
-            const chunks = chunkText(line, maxWidth);
-    
-            // Append each chunk as a new line
-            chunks.forEach(chunk => {
-                const newLine = document.createElement('div');
-                newLine.textContent = chunk;
-                output.appendChild(newLine);
-            });
-        });
-    
-        // Ensure the output is scrolled to the bottom
-        output.scrollTop = output.scrollHeight;
+        if (animationEnabled) {
+            animateText(text, output);
+        } else {
+            const newLine = document.createElement('div');
+            newLine.textContent = text;
+            output.appendChild(newLine);
+            output.scrollTop = output.scrollHeight;
+        }
     }
     
-    // Function to chunk text into lines that fit within a specified width
-    function chunkText(text, maxWidth) {
-        const words = text.split(' ');
-        const lines = [];
-        let currentLine = '';
+    function animateText(text, output) {
+        let currentIndex = 0;
     
-        words.forEach(word => {
-            const testLine = currentLine + (currentLine ? ' ' : '') + word;
-            const testWidth = getTextWidth(testLine);
+        const intervalId = setInterval(() => {
+            const currentLine = output.lastChild || document.createElement('div');
+            const currentText = (currentLine.textContent || '') + text[currentIndex];
+            currentLine.textContent = currentText;
     
-            if (testWidth <= maxWidth) {
-                currentLine = testLine;
-            } else {
-                lines.push(currentLine);
-                currentLine = word;
+            if (!currentLine.parentNode) {
+                output.appendChild(currentLine);
+            }
+    
+            if (currentIndex === text.length - 1) {
+                output.appendChild(document.createElement('div')); // Add a new line
+                clearInterval(intervalId);
+                // Scroll to the bottom after the animation is complete
+                output.scrollTop = output.scrollHeight;
+            }
+    
+            currentIndex++;
+        }, 30); // Adjust the delay between letters (in milliseconds)
+    }
+    
+    function isValidColor(color) {
+        const colorRegex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
+        return colorRegex.test(color);
+    }
+    
+    // Function to change the terminal color
+    function changeTerminalColor(newColor) {
+        const terminal = document.querySelector('.terminal');
+        const elementsToColor = document.querySelectorAll('.prompt, #commandInput, body');
+    
+        // Apply the color to text, border, and keyframes
+        [terminal, ...elementsToColor].forEach(element => {
+            element.style.color = newColor;
+            if (element === terminal) {
+                element.style.borderColor = newColor;
             }
         });
     
-        lines.push(currentLine);
-        return lines;
+        // Change the keyframes dynamically
+        const styleSheet = document.styleSheets[0]; // Assuming the styles are in the first stylesheet
+        const keyframesRule = findKeyframesRule(styleSheet, 'glow');
+    
+        if (keyframesRule) {
+            keyframesRule.deleteRule(0); // Delete the existing rule
+    
+            // Add the new rule with the updated color
+            keyframesRule.appendRule(`from { text-shadow: 0 0 10px ${newColor}, 0 0 20px ${newColor}, 0 0 30px ${newColor}; }`);
+            keyframesRule.appendRule(`to { text-shadow: 0 0 15px ${newColor}, 0 0 25px ${newColor}, 0 0 35px ${newColor}; }`);
+        }
     }
     
-    // Function to get the width of a text element in pixels
-    function getTextWidth(text) {
-        const testElement = document.createElement('div');
-        testElement.style.position = 'absolute';
-        testElement.style.whiteSpace = 'nowrap';
-        testElement.textContent = text;
-        document.body.appendChild(testElement);
-        const width = testElement.clientWidth;
-        document.body.removeChild(testElement);
-        return width;
+    // Function to find a specific keyframes rule in a stylesheet
+    function findKeyframesRule(styleSheet, ruleName) {
+        return Array.from(styleSheet.cssRules).find(rule => rule.type === CSSRule.KEYFRAMES_RULE && rule.name === ruleName) || null;
     }
-    
 
     function clearOutput() {
         output.innerHTML = '';
