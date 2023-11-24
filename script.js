@@ -1,9 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
     const output = document.getElementById('output');
-    const input = document.getElementById('commandInput');
+    const input = document.getElementById('terminal');
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     let animationEnabled = true;
-
+    let soundEnabled = true;
+    let currentDir = "/";
+    let previousInputs =[];
+    let numberInputs = "";
+    
     function playKeyboardSound() {
         const oscillator = audioContext.createOscillator();
         oscillator.type = 'sine';
@@ -14,23 +18,31 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const body = [{
-        aboutme: "Hello I am John Doe...",
-        cv: "Prints cv.txt ",
-        previouswork: {
-            companyX: "I worked for x...",
-            companyY: "I worked for y...",
-            companyZ: "I worked for y...",
+        "aboutme.txt": "Hello I am John Doe...",
+        "cv.txt": "cv.txt",
+        "/previouswork": {
+            "companyX.txt": "I worked for x...",
+            "companyY.txt": "I worked for y...",
+            "companyZ.txt": "I worked for y...",
         },
-        contact: {
-            email: "email@test.com",
-            github: "github.com/johndoes",
+        "/contact": {
+            "email.txt": "email@test.com",
+            "github.txt": "github.com/johndoes",
+        },
+        "/blog": {
+            "21-11-2023": "21-11-2023.txt",
         }
     }];
 
     input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            playKeyboardSound(); // Play the keyboard sound
+            if (soundEnabled == true){playKeyboardSound()}; // Play the keyboard sound
+            previousInputs.push(input.value)
+            previousInputs = previousInputs.filter(item => item !== "")
+            previousInputs.push("");
+            numberInputs = previousInputs.length - 1;
+            console.log(previousInputs)
             processCommand(input.value);
             input.value = '';
         }
@@ -42,6 +54,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // Check if the command starts with "color"
         if (trimmedCommand.startsWith('color')) {
             // Extract the color value from the command
+            if(trimmedCommand === "color random" || trimmedCommand === "color ran"){
+                const color = generateRandomHexColor()
+                changeTerminalColor(color);
+                addToOutput(`Color changed to: ${color}`);
+            } else {
             const colorValue = trimmedCommand.split(' ')[1];
     
             if(colorValue === "reset"){
@@ -54,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 addToOutput('Invalid color input. Please enter a valid hex code.');
             }
+        }
         } else {
             // Handle other commands...
             switch (trimmedCommand) {
@@ -65,35 +83,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 case 'cv':
                 case 'cv.txt':
                     clearOutput();
-                    loadAndDisplayFile('cv.txt');
+                    loadAndDisplayFile(body[0]["cv.txt"]);
                     break;
-                case 'previouswork.txt':
-                case 'previouswork':
+                case '/previouswork':
                 case 'pre':
-                    addToOutput('Previous Work:');
-                    for (const company in body[0].previouswork) {
-                        if (body[0].previouswork.hasOwnProperty(company)) {
-                            addToOutput(`${company}: ${body[0].previouswork[company]}`);
-                        }
-                    }
+                    currentDir = "/previouswork"
+                    document.getElementById('prompt').textContent = currentDir;
                     break;
                 case 'contact':
-                case 'contact.txt':
-                    addToOutput('Contact Information:');
-                    for (const method in body[0].contact) {
-                        if (body[0].contact.hasOwnProperty(method)) {
-                            addToOutput(`${method}: ${body[0].contact[method]}`);
-                        }
-                    }
+                case '/contact':
+                    currentDir = "/contact"
+                    document.getElementById('prompt').textContent = currentDir;
+                    break;
+                case 'blog':
+                case '/blog':
+                    currentDir = "/blog"
+                    document.getElementById('prompt').textContent = currentDir;
                     break;
                 case 'help':
                     addToOutput(`ls: List directories
 clear: Clear screen
 color #hexcode: Change display color
-anim: Toggle animation`);
+anim: Toggle text animation
+fx: Toggle sound effects
+cd: Go to /`);
                     break;
                 case 'ls':
-                    displayBodyContents();
+                    if (currentDir == "/"){
+                        displayBodyContents(body[0]);
+                    } else if (body[0].hasOwnProperty(currentDir)){
+                        displayBodyContents(body[0][currentDir]);
+                    } else {
+                        addToOutput("Directory not found.")
+                    }
                     break;
                 case 'anim':
                 case 'animation':
@@ -105,12 +127,29 @@ anim: Toggle animation`);
                         addToOutput("Text is animated.")
                     };
                     break;
+                case 'sound':
+                case 'fx':
+                    if (soundEnabled){
+                        soundEnabled = false
+                        addToOutput("Sound effects muted.")
+                    } else {
+                        soundEnabled = true
+                        addToOutput("Sound effects unmuted.")
+                    };
+                    break;
                 case 'clear':
                 case 'cls':
                     clearOutput();
                     break;
+                case 'cd':
+                    currentDir = "/"
+                    document.getElementById('prompt').textContent = currentDir;
+                    break;
+                case 'hello':
+                case 'Hello':
+                    addToOutput(`${input.value} world!`)
+                    break;
                 case '':
-                    addToOutput(``);
                     break;
                 default:
                     addToOutput('Command not found: ' + trimmedCommand);
@@ -124,7 +163,7 @@ anim: Toggle animation`);
         if (animationEnabled) {
             animateText(text, output);
         } else {
-            const newLine = document.createElement('div');
+            const newLine = document.createElement('pre');
             newLine.textContent = text;
             output.appendChild(newLine);
             output.scrollTop = output.scrollHeight;
@@ -133,9 +172,10 @@ anim: Toggle animation`);
     
     function animateText(text, output) {
         let currentIndex = 0;
+        output.appendChild(document.createElement('pre'));
     
         const intervalId = setInterval(() => {
-            const currentLine = output.lastChild || document.createElement('div');
+            const currentLine = output.lastChild || document.createElement('pre');
             const currentText = (currentLine.textContent || '') + text[currentIndex];
             currentLine.textContent = currentText;
     
@@ -144,14 +184,14 @@ anim: Toggle animation`);
             }
     
             if (currentIndex === text.length - 1) {
-                output.appendChild(document.createElement('div')); // Add a new line
+                output.appendChild(document.createElement('pre')); // Add a new line
                 clearInterval(intervalId);
                 // Scroll to the bottom after the animation is complete
                 output.scrollTop = output.scrollHeight;
             }
     
             currentIndex++;
-        }, 30); // Adjust the delay between letters (in milliseconds)
+        },1); // Adjust the delay between letters (in milliseconds)
     }
     
     function isValidColor(color) {
@@ -161,51 +201,27 @@ anim: Toggle animation`);
     
     // Function to change the terminal color
     function changeTerminalColor(newColor) {
-        const terminal = document.querySelector('.terminal');
-        const elementsToColor = document.querySelectorAll('.prompt, #commandInput, body');
-    
-        // Apply the color to text, border, and keyframes
-        [terminal, ...elementsToColor].forEach(element => {
-            element.style.color = newColor;
-            if (element === terminal) {
-                element.style.borderColor = newColor;
-            }
-        });
-    
-        // Change the keyframes dynamically
-        const styleSheet = document.styleSheets[0]; // Assuming the styles are in the first stylesheet
-        const keyframesRule = findKeyframesRule(styleSheet, 'glow');
-    
-        if (keyframesRule) {
-            keyframesRule.deleteRule(0); // Delete the existing rule
-    
-            // Add the new rule with the updated color
-            keyframesRule.appendRule(`from { text-shadow: 0 0 10px ${newColor}, 0 0 20px ${newColor}, 0 0 30px ${newColor}; }`);
-            keyframesRule.appendRule(`to { text-shadow: 0 0 15px ${newColor}, 0 0 25px ${newColor}, 0 0 35px ${newColor}; }`);
-        }
-    }
-    
-    // Function to find a specific keyframes rule in a stylesheet
-    function findKeyframesRule(styleSheet, ruleName) {
-        return Array.from(styleSheet.cssRules).find(rule => rule.type === CSSRule.KEYFRAMES_RULE && rule.name === ruleName) || null;
-    }
+        document.querySelector(':root').style.setProperty('--lime', newColor)
+    };
 
     function clearOutput() {
         output.innerHTML = '';
     }
-
-    function displayBodyContents() {
-        let outputText = '';
-        const keys = Object.keys(body[0]);
     
-        if (keys.length > 1) {
-            keys.forEach((key, index) => {
-                outputText += `${key}.txt`;
-                if (index < keys.length - 1) {
-                    outputText += '  '; // Add space between items
-                }})};
+    function displayBodyContents(technicalDir) {
+        let outputText = '';
+    
+        for (const key in technicalDir) {
+                    outputText += `${key} `;
+            }
 
         addToOutput(outputText);
+    }
+
+    function generateRandomHexColor() {
+        const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    
+        return '#' + '0'.repeat(6 - randomColor.length) + randomColor;
     }
 
     function loadAndDisplayFile(filename) {
@@ -229,8 +245,32 @@ anim: Toggle animation`);
 
     // Prevent clicking away from the input
     document.addEventListener('click', function (event) {
-        if (!event.target.matches('#commandInput')) {
+        if (!event.target.matches('#terminal')) {
             input.focus();
         }
     });
+
+
+    document.addEventListener('keydown', function (e) {
+        switch (e.key) {
+            case 'ArrowUp':
+                if (numberInputs > 0) {
+                 console.log(previousInputs[numberInputs])
+                 document.getElementById('terminal').value = previousInputs[numberInputs-1]
+                 numberInputs-=1
+                 console.log(numberInputs)
+                }
+                break;
+            case 'ArrowDown':
+                if (previousInputs[numberInputs] != undefined) {
+                console.log(previousInputs[numberInputs])
+                 document.getElementById('terminal').value = previousInputs[numberInputs]
+                 numberInputs+=1
+                 console.log(numberInputs)
+                }
+                break;
+        }
+    });
+
+
 });

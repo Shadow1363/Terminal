@@ -1,3 +1,8 @@
+:root {
+    --lime: #00ff00;
+    --pixel: 4px
+}
+  
 body {
     margin: 0;
     padding: 0;
@@ -6,7 +11,7 @@ body {
     justify-content: center;
     min-height: 100vh;
     background-color: #000;
-    color: #00ff00; /* green text color */
+    color: var(--lime); /* green text color */
     font-family: 'Courier New', monospace;
     position: relative;
 }
@@ -15,7 +20,7 @@ body {
     background-color: #000;
     padding: 20px;
     border-radius: 5px;
-    border: 1px solid #00ff00;
+    border: 1px solid var(--lime);
     width: 100%; /* Updated width to 100% */
     max-width: 100%; /* Set a maximum width if desired */
     height: 100vh; /* Set height to full viewport height */
@@ -30,8 +35,9 @@ body {
     white-space: nowrap;
     
 }
-#output, input#commandInput, .prompt {
+#output, input#terminal, span#prompt.prompt {
     animation: glow 1s infinite alternate; /* Glowing animation */
+    font-size: 13px;
 }
 
 .input-line {
@@ -39,18 +45,17 @@ body {
     align-items: center;
 }
 
-#commandInput {
+#terminal {
     border: none;
     background-color: transparent;
-    color: #00ff00; /* green text color */
+    color: var(--lime); /* green text color */
     font-family: 'Courier New', monospace;
     width: 100%;
     outline: none;
 }
 
 .prompt {
-    color: #00ff00;
-    margin-right: 5px;
+    color: var(--lime);
 }
 
 .terminal::before {
@@ -80,10 +85,10 @@ body {
 
 @keyframes glow {
     from {
-        text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+        text-shadow: 0 0 10px var(--lime), 0 0 20px var(--lime), 0 0 30px var(--lime);
     }
     to {
-        text-shadow: 0 0 15px #00ff00, 0 0 25px #00ff00, 0 0 35px #00ff00;
+        text-shadow: 0 0 15px var(--lime), 0 0 25px var(--lime), 0 0 35px var(--lime);
     }
 }
 
