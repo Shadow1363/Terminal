@@ -5,7 +5,7 @@ A simple Linux Terminal Themed - Portfolio Website
 
 See it in action here: https://shadow1363.github.io/terminal/
 
-Feel free to leave a pull request or an issue, thanks.
+Feel free to leave a pull request or report an issue, thanks.
 
 # planned features
 - download cv command
