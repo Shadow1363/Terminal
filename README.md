@@ -9,11 +9,9 @@ Feel free to leave a pull request or report an issue, thanks.
 
 # planned features
 **Priority** - Fix code, it's not very good and kinda broken, so use at own risk
-- download cv command
-- more soundeffects
-- fix glow effect 
-- more commands
-- easter eggs :)
+- bug fixes (animation, sound)
+- OS booting (Something like pico-8, lethal company etc)
+- Modular file system to access objects
 
 # resource
 https://manytools.org/hacker-tools/ascii-banner/
