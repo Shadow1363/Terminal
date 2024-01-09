@@ -1,5 +1,5 @@
 # terminal
-![image](https://github.com/Shadow1363/terminal/assets/112425274/e532831f-7e50-4461-91c0-ec8a8f766202)
+![image](https://github.com/Shadow1363/terminal/assets/112425274/788f89f0-6fe8-4060-b0d5-216a8a27a077)
 
 A simple Linux Terminal Themed - Portfolio Website
 
