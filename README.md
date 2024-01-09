@@ -17,5 +17,7 @@ Feel free to leave a pull request or report an issue, thanks.
 https://manytools.org/hacker-tools/ascii-banner/
 I recommend small/small-slanted
 
+https://www.asciiart.eu/image-to-ascii
+I recommend "Transparent frame 10px"
 # license
 [![Hippocratic License HL3-FULL](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-FULL&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/full.html)

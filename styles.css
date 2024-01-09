@@ -23,7 +23,7 @@ body {
     border: 1px solid var(--lime);
     width: 100%; /* Updated width to 100% */
     max-width: 100%; /* Set a maximum width if desired */
-    height: 100vh; /* Set height to full viewport height */
+    height: 200vh; /* Set height to full viewport height */
     overflow: auto; /* Add overflow for scrolling */
     box-sizing: border-box; /* Include padding and border in the total width/height */
     position: relative;
