@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         } else {
             // Exit
-            if (trimmedCommand == "cd .." ) {
+            if (trimmedCommand == "cd" ) {
                 search = body;
                 document.getElementById('prompt').textContent = `/`;
                 return;
