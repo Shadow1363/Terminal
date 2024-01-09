@@ -8,9 +8,9 @@ See it in action here: https://shadow1363.github.io/terminal/
 Feel free to leave a pull request or report an issue, thanks.
 
 # planned features
+**Priority** - Fix code, it's not very good and kinda broken, so use at own risk
 - download cv command
 - more soundeffects
-- cleaner and neater code
 - fix glow effect 
 - more commands
 - easter eggs :)
