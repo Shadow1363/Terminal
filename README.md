@@ -18,8 +18,8 @@ If you want to display a .txt file on the terminal:
 
 # planned features
 - cleaner more optimized code
-- bug fixes (animation, sound and up and arrow keys)
-- OS booting (Something like pico-8, lethal company etc)
+- bug fixes (animation, sound and arrow keys)
+- OS boot screen (pico-8, lethal company, etc)
 
 # resources
 https://manytools.org/hacker-tools/ascii-banner/
