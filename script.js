@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
             colorCommands(trimmedCommand);
             return;
         }
-        if (trimmedCommand == "help" || trimmedCommand == "cls" || trimmedCommand == "anim" || trimmedCommand == "fx" || trimmedCommand == ""){
+        if (trimmedCommand == "help" || trimmedCommand == "cls" || trimmedCommand == "anim" || trimmedCommand == "fx" || trimmedCommand == "hello"){
             commands(trimmedCommand);
             return;
         } else {
