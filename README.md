@@ -10,14 +10,14 @@ Feel free to leave a pull request or report an issue, thanks.
 # how it works
 ![image](https://github.com/Shadow1363/terminal/assets/112425274/fecb170d-d62f-44cb-8593-14937aada79c)
 
-The whole program is dependant on body. Add and remove objects to your liking.
+The whole program is dependant on const body. Edit it to your heart's content.
 
 If you want to display a .txt file on the terminal: 
 - add the filename.txt file in files
 - add this inside body: "filename.txt": "filename.txt"
 
 # planned features
-- cleaner more optimized code
+- cleaner & more optimized code
 - bug fixes (animation, sound and arrow keys)
 - OS boot screen (pico-8, lethal company, etc)
 
