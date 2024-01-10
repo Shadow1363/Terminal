@@ -4,8 +4,7 @@
 A simple Linux Terminal Themed - Portfolio Website
 
 See it in action here: https://shadow1363.github.io/terminal/
-
-Feel free to leave a pull request or report an issue, thanks.
+Run "help" to get a list of all commands.
 
 # how it works
 ![image](https://github.com/Shadow1363/terminal/assets/112425274/fecb170d-d62f-44cb-8593-14937aada79c)
@@ -20,6 +19,7 @@ If you want to display a .txt file on the terminal:
 - cleaner & more optimized code
 - bug fixes (animation, sound and arrow keys)
 - OS boot screen (pico-8, lethal company, etc)
+- wiki page
 
 # resources
 https://manytools.org/hacker-tools/ascii-banner/
