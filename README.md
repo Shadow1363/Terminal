@@ -4,7 +4,6 @@
 A simple Linux Terminal Themed - Portfolio Website
 
 See it in action here: https://shadow1363.github.io/terminal/
-Run "help" to get a list of all commands.
 
 # how it works
 ![image](https://github.com/Shadow1363/terminal/assets/112425274/fecb170d-d62f-44cb-8593-14937aada79c)
