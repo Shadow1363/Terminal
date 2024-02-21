@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let animationEnabled = true;
     let soundEnabled = true;
     let currentDir = "/";
-    let previousInputs =[];
-    let numberInputs = "";
+    let previousInputs =[""];
+    let numberInputs = 0;
     
     function playKeyboardSound() {
         const oscillator = audioContext.createOscillator();
@@ -46,16 +46,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (soundEnabled) playKeyboardSound(); // Play the keyboard sound
         
         if (input.value !== "") {
+            let previousInput = previousInputs.pop();
             previousInputs.push(input.value);
+            previousInputs.push(previousInput);
         }
-        
-        previousInputs.push("");
-        numberInputs = previousInputs.length - 1;
+        numberInputs = previousInputs.length-1;
         
         console.log(previousInputs);
         
         processCommand(input.value);
-        input.value = '';
+        input.value = previousInputs[numberInputs];
     })
     
 
@@ -244,19 +244,20 @@ cd: Go to /`);
     document.addEventListener('keydown', function (e) {
         switch (e.key) {
             case 'ArrowUp':
+                e.preventDefault(); // Prevent default behavior
                 if (numberInputs > 0) {
-                 console.log(previousInputs[numberInputs])
-                 document.getElementById('terminal').value = previousInputs[numberInputs-1]
-                 numberInputs-=1
-                 console.log(numberInputs)
+                    numberInputs-=1
+                    console.log(numberInputs)
+                    input.value = previousInputs[numberInputs];
+                    input.setSelectionRange(input.value.length, input.value.length); // Set the caret position to the end of the word
                 }
                 break;
             case 'ArrowDown':
-                if (previousInputs[numberInputs] != undefined) {
-                console.log(previousInputs[numberInputs])
-                 document.getElementById('terminal').value = previousInputs[numberInputs]
-                 numberInputs+=1
-                 console.log(numberInputs)
+                if (numberInputs != previousInputs.length-1) {
+                    console.log(previousInputs[numberInputs])
+                    numberInputs+=1
+                    //  console.log(numberInputs)
+                    input.value = previousInputs[numberInputs];
                 }
                 break;
         }
