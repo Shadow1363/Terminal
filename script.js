@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const output = document.getElementById('output');
     const input = document.getElementById('terminal');
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const commandsList = ['cd', 'ls', 'help', 'anim', 'fx', 'cls', 'hello', 'color', 'color ran', 'color random', 'color reset'];
     let animationEnabled = true;
     let soundEnabled = true;
     let currentDir = "/";
@@ -17,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
         oscillator.stop(audioContext.currentTime + 0.1); // Adjust the duration of the sound
     }
 
-    const body = [{
+    const body = {
         "aboutme": {
             "aboutme.txt":"Hello I am John Doe...",
             "picture.txt": "picture.txt"
@@ -35,10 +36,29 @@ document.addEventListener('DOMContentLoaded', function () {
         "blog": {
             "21-11-2023": "21-11-2023.txt",
         }
-    }];
+    };
     let search = body;
 
     input.addEventListener('keydown', function (e) {
+        //adding autocomplete
+        if(e.key === "Tab") {
+            e.preventDefault();
+            if(input.value === '') return;
+            // search in the object search first
+            for(command of Object.keys(search)) {
+                if(command.startsWith(input.value)) {
+                    input.value = command;
+                }
+            }
+            // search in the commandsList second
+            for(let command of commandsList) {
+                if(command.startsWith(input.value)) {
+                    input.value = command;
+                    break;
+                }
+            }
+        }
+
         if (e.key !== 'Enter') return;
         
         e.preventDefault();
@@ -77,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
             // List all keys of current object
-            for (const obj of search) {
+            for (const obj of [search]) {
                 if (trimmedCommand == "ls"){
                     const keys = Object.keys(obj);
                     addToOutput(keys.join('  '));
@@ -86,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 else if (obj.hasOwnProperty(trimmedCommand)) {
                     // Change current obj to object key typed
                     if (typeof obj[trimmedCommand] === 'object') {
-                        search = [obj[trimmedCommand]];
+                        search = obj[trimmedCommand];
                         document.getElementById('prompt').textContent = `/${trimmedCommand}`;
                         addToOutput(`/${trimmedCommand}`);
                     } else if(typeof obj[trimmedCommand] === 'string' && obj[trimmedCommand].includes(".txt")) {
