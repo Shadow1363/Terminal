@@ -16,7 +16,7 @@ If you want to display a .txt file on the terminal:
 
 # planned features
 - cleaner & more optimized code
-- bug fixes (animation, sound && ~~arrow keys~~, thanks @n3dhir!)
+- bug fixes (animation, sound and ~~arrow keys~~ thanks @n3dhir!)
 - OS boot screen (pico-8, lethal company, etc)
 - wiki page
 
