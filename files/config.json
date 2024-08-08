@@ -1,0 +1,47 @@
+{
+  "version": 1.0,
+  "config": {
+    "help": [
+      "ls: List directories",
+      "cls: Clear screen",
+      "color #hexcode: Change display color",
+      "anim: Toggle text animation",
+      "fx: Toggle sound effects",
+      "cd: Go to /",
+      "font #font: Change display font"
+    ],
+    "anim": true,
+    "sound": true,
+    "color": "#00ff00",
+    "fonts": [
+      { "name": "Monospace", "alias": ["1", "monospace", "m", "default"] },
+      {
+        "name": "\"Courier New\", monospace",
+        "alias": ["2", "courier new", "c"]
+      },
+      {
+        "name": "\"JetBrains Mono NL\", sans-serif",
+        "alias": ["3", "jetbrains", "j"]
+      }
+    ]
+  },
+  "website": {
+    "aboutme": {
+      "resume": "Hello I am John Doe...",
+      "picture": "picture.txt"
+    },
+    "cv": "cv.txt",
+    "previouswork": {
+      "companyx": "I worked for x...",
+      "companyy": "I worked for y...",
+      "companyz": "I worked for y..."
+    },
+    "contact": {
+      "email": "john.doe@gmail.com",
+      "github": "github.com/johndoe"
+    },
+    "blog": {
+      "21-11-2023": "21-11-2023.txt"
+    }
+  }
+}
