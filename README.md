@@ -1,4 +1,4 @@
-# terminal
+```
    ___           __  ___     ___        ______              _           __
   / _ \___  ____/ /_/ _/__  / (_)__    /_  __/__ ______ _  (_)__  ___ _/ /
  / ___/ _ \/ __/ __/ _/ _ \/ / / _ \    / / / -_) __/  ' \/ / _ \/ _ `/ / 
@@ -7,7 +7,7 @@
 Portfolio Terminal [Version 1.01]
 (c) Open Source. https://github.com/Shadow1363/terminal
 A simple Linux Terminal Themed - Portfolio Website
-
+```
 # how it works
 ```json
 {
