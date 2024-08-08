@@ -1,19 +1,64 @@
 # terminal
-![image](https://github.com/Shadow1363/terminal/assets/112425274/788f89f0-6fe8-4060-b0d5-216a8a27a077)
-
+   ___           __  ___     ___        ______              _           __
+  / _ \___  ____/ /_/ _/__  / (_)__    /_  __/__ ______ _  (_)__  ___ _/ /
+ / ___/ _ \/ __/ __/ _/ _ \/ / / _ \    / / / -_) __/  ' \/ / _ \/ _ `/ / 
+/_/   \___/_/  \__/_/ \___/_/_/\___/   /_/  \__/_/ /_/_/_/_/_//_/\_,_/_/  
+                                                                                    
+Portfolio Terminal [Version 1.01]
+(c) Open Source. https://github.com/Shadow1363/terminal
 A simple Linux Terminal Themed - Portfolio Website
 
-See it in action here: https://shadow1363.github.io/terminal/
-
 # how it works
-![image](https://github.com/user-attachments/assets/4647085d-79fb-485e-bf13-5b4d84d6546f)
+```json
+{
+  "version": 1.01,
+  "config": {
+    "help": [
+      "ls: List directories",
+      "cls: Clear screen",
+      "color #hexcode: Change display color",
+      "anim: Toggle text animation",
+      "fx: Toggle sound effects",
+      "cd: Go to /",
+      "font #font: Change display font"
+    ],
+    "anim": true,
+    "sound": true,
+    "color": "#00ff00",
+    "fonts": [
+      { "name": "Monospace", "alias": ["1", "monospace", "m", "default"] },
+      {
+        "name": "\"Courier New\", monospace",
+        "alias": ["2", "courier new", "c"]
+      },
+      {
+        "name": "\"JetBrains Mono NL\", sans-serif",
+        "alias": ["3", "jetbrains", "j"]
+      }
+    ]
+  },
+  "website": {
+    "aboutme": {
+      "resume": "Hello I am John Doe...",
+      "picture": "picture.txt"
+    },
+    "cv": "cv.txt",
+    "previouswork": {
+      "companyx": "I worked for x...",
+      "companyy": "I worked for y...",
+      "companyz": "I worked for y..."
+    },
+    "contact": {
+      "email": "john.doe@gmail.com",
+      "github": "github.com/johndoe"
+    }
+  }
+}
+```
 
 The whole program is dependant on `files/config.json`. Edit it to your heart's content.
 You can also add .txt files in `/files` and it will open up when acessed.
-
-![image](https://github.com/user-attachments/assets/ef450667-e761-4a60-8648-543c0bb38faa)
-
-Here you can configure the color used, should animations & sound play and add fonts.
+You can configure the color used, should animations & sound play and add fonts.
 
 # planned features
 - ~~cleaner, more optimized code & ease of editing or modifying~~ **DONE**
