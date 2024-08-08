@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": 1.01,
   "config": {
     "help": [
       "ls: List directories",
@@ -32,16 +32,13 @@
     },
     "cv": "cv.txt",
     "previouswork": {
-      "companyx": "I worked for x...",
-      "companyy": "I worked for y...",
-      "companyz": "I worked for y..."
+      "company_x": "I worked for x...",
+      "company_y": "I worked for y...",
+      "company_z": "I worked for y..."
     },
     "contact": {
       "email": "john.doe@gmail.com",
       "github": "github.com/johndoe"
-    },
-    "blog": {
-      "21-11-2023": "21-11-2023.txt"
     }
   }
 }
