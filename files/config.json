@@ -1,7 +1,8 @@
 {
-  "version": 1.01,
+  "version": 1.02,
   "config": {
     "help": [
+      "echo: Echos your message",
       "ls: List directories",
       "cls: Clear screen",
       "color #hexcode: Change display color",
@@ -26,12 +27,12 @@
     ]
   },
   "website": {
-    "aboutme": {
+    "about_me": {
       "resume": "Hello I am John Doe...",
       "picture": "picture.txt"
     },
     "cv": "cv.txt",
-    "previouswork": {
+    "previous_work": {
       "company_x": "I worked for x...",
       "company_y": "I worked for y...",
       "company_z": "I worked for y..."
