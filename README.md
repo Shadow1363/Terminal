@@ -6,19 +6,17 @@ A simple Linux Terminal Themed - Portfolio Website
 See it in action here: https://shadow1363.github.io/terminal/
 
 # how it works
-![image](https://github.com/Shadow1363/terminal/assets/112425274/fecb170d-d62f-44cb-8593-14937aada79c)
+![image](https://github.com/user-attachments/assets/4647085d-79fb-485e-bf13-5b4d84d6546f)
+The whole program is dependant on `files/config.json`. Edit it to your heart's content.
+You can also add .txt files in `/files` and it will open up when acessed.
 
-The whole program is dependant on `files/website.json`. Edit it to your heart's content.
-
-If you want to display a .txt file on the terminal: 
-- add the filename.txt file in files
-- add this inside body: "filename.txt": "filename.txt"
+![image](https://github.com/user-attachments/assets/ef450667-e761-4a60-8648-543c0bb38faa)
+Here you can configure the color used, should animations & sound play and add fonts.
 
 # planned features
-- cleaner, more optimized code & ease of editing or modifying
+- ~~cleaner, more optimized code & ease of editing or modifying~~
 - bug fixes (animation, sound and ~~arrow keys~~ thanks @n3dhir!)
-- OS boot screen (similar to pico-8, lethal company, etc)
-- wiki page
+- OS boot screen (similar to pico-8, lethal company, etc) _Halfway done!_
 
 # /cover
 You can ignore it, it's going to be used for my personal site, tomasmartinez.xyz
