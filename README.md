@@ -7,10 +7,12 @@ See it in action here: https://shadow1363.github.io/terminal/
 
 # how it works
 ![image](https://github.com/user-attachments/assets/4647085d-79fb-485e-bf13-5b4d84d6546f)
+
 The whole program is dependant on `files/config.json`. Edit it to your heart's content.
 You can also add .txt files in `/files` and it will open up when acessed.
 
 ![image](https://github.com/user-attachments/assets/ef450667-e761-4a60-8648-543c0bb38faa)
+
 Here you can configure the color used, should animations & sound play and add fonts.
 
 # planned features
