@@ -16,9 +16,13 @@ You can also add .txt files in `/files` and it will open up when acessed.
 Here you can configure the color used, should animations & sound play and add fonts.
 
 # planned features
-- ~~cleaner, more optimized code & ease of editing or modifying~~
-- bug fixes (animation, sound and ~~arrow keys~~ thanks @n3dhir!)
-- OS boot screen (similar to pico-8, lethal company, etc) _Halfway done!_
+- ~~cleaner, more optimized code & ease of editing or modifying~~ **DONE**
+- OS boot screen (similar to pico-8, lethal company, etc) **Halfway Done**
+- bug fixes 
+  1. Animation breaks if another command is sent while it's animating text
+  2. Sound Improvements
+  3. ~~Arrow Keys not bring history back properly~~ thanks @n3dhir!
+  4. Limit text/Infinitly long background
 
 # /cover
 You can ignore it, it's going to be used for my personal site, tomasmartinez.xyz
