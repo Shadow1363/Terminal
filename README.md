@@ -62,7 +62,7 @@ A simple Linux Terminal Themed - Portfolio Website
 
 The whole program is dependant on `files/config.json`. Edit it to your heart's content.
 You can also add .txt files in `/files` and it will open up when acessed.
-You can configure the color used, should animations & sound play and add fonts.
+You can configure the color used, should animations/sound play and add/change fonts.
 
 # planned features
 
