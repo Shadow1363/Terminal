@@ -68,7 +68,7 @@ You can configure the color used, should animations/sound play and add/change fo
 
 - ~~cleaner, more optimized code & ease of editing or modifying~~ **DONE**
 - OS boot screen (similar to pico-8, lethal company, etc) **Halfway Done**
-- Icon
+- ~~favicon~~
 - bug fixes
   1. Animation breaks if another command is sent while it's animating text
   2. Sound Improvements
