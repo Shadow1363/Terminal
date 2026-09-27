@@ -1,29 +1,26 @@
 {
-  "version": 1.02,
+  "version": "1.03",
   "config": {
     "help": [
-      "echo: Echos your message",
+      "echo <text>: Echos your message",
       "ls: List directories",
+      "cd <dir>: Change directory (cd .. to go up, cd to go to /)",
       "cls: Clear screen",
-      "color #hexcode: Change display color",
+      "color <#hex|name|random|reset>: Change display color",
+      "font <font>: Change display font",
       "anim: Toggle text animation",
       "fx: Toggle sound effects",
-      "cd: Go to /",
-      "font #font: Change display font"
+      "",
+      "Tab: Autocomplete | Up/Down: Command history"
     ],
     "anim": true,
     "sound": true,
     "color": "#00ff00",
+    "scrollback": 200,
     "fonts": [
       { "name": "Monospace", "alias": ["1", "monospace", "m", "default"] },
-      {
-        "name": "\"Courier New\", monospace",
-        "alias": ["2", "courier new", "c"]
-      },
-      {
-        "name": "\"JetBrains Mono NL\", sans-serif",
-        "alias": ["3", "jetbrains", "j"]
-      }
+      { "name": "\"Courier New\", monospace", "alias": ["2", "courier new", "courier", "c"] },
+      { "name": "\"JetBrains Mono NL\", monospace", "alias": ["3", "jetbrains mono", "jetbrains", "j"] }
     ]
   },
   "website": {

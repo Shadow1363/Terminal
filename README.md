@@ -4,7 +4,7 @@
  / ___/ _ \/ __/ __/ _/ _ \/ / / _ \    / / / -_) __/  ' \/ / _ \/ _ `/ /
 /_/   \___/_/  \__/_/ \___/_/_/\___/   /_/  \__/_/ /_/_/_/_/_//_/\_,_/_/
 
-Portfolio Terminal [Version 1.02]
+Portfolio Terminal [Version 1.03]
 (c) Open Source. https://github.com/Shadow1363/terminal
 A simple Linux Terminal Themed - Portfolio Website
 ```
@@ -13,31 +13,28 @@ A simple Linux Terminal Themed - Portfolio Website
 
 ```json
 {
-  "version": 1.02,
+  "version": "1.03",
   "config": {
     "help": [
-      "echo: Echos your message",
+      "echo <text>: Echos your message",
       "ls: List directories",
+      "cd <dir>: Change directory (cd .. to go up, cd to go to /)",
       "cls: Clear screen",
-      "color #hexcode: Change display color",
+      "color <#hex|name|random|reset>: Change display color",
+      "font <font>: Change display font",
       "anim: Toggle text animation",
       "fx: Toggle sound effects",
-      "cd: Go to /",
-      "font #font: Change display font"
+      "",
+      "Tab: Autocomplete | Up/Down: Command history"
     ],
     "anim": true,
     "sound": true,
     "color": "#00ff00",
+    "scrollback": 200,
     "fonts": [
       { "name": "Monospace", "alias": ["1", "monospace", "m", "default"] },
-      {
-        "name": "\"Courier New\", monospace",
-        "alias": ["2", "courier new", "c"]
-      },
-      {
-        "name": "\"JetBrains Mono NL\", sans-serif",
-        "alias": ["3", "jetbrains", "j"]
-      }
+      { "name": "\"Courier New\", monospace", "alias": ["2", "courier new", "courier", "c"] },
+      { "name": "\"JetBrains Mono NL\", monospace", "alias": ["3", "jetbrains mono", "jetbrains", "j"] }
     ]
   },
   "website": {
@@ -57,23 +54,25 @@ A simple Linux Terminal Themed - Portfolio Website
     }
   }
 }
-
 ```
 
-The whole program is dependant on `files/config.json`. Edit it to your heart's content.
-You can also add .txt files in `/files` and it will open up when acessed.
-You can configure the color used, should animations/sound play and add/change fonts.
+The whole program is dependent on `files/config.json`. Edit it to your heart's content.
+You can also add .txt files in `/files` and they will open up when accessed.
+You can configure the color used, whether animations & sound play, how many outputs are kept on screen (`scrollback`) and add fonts.
+
+Anything in `website` becomes the file system: objects are directories, strings are files (a string ending in `.txt` is loaded from `/files`).
+Navigate with `cd about_me`, `cd about_me/resume`, `cd ..`, or just type a name directly. Tab autocompletes commands and paths, Up/Down browses history.
 
 # planned features
 
 - ~~cleaner, more optimized code & ease of editing or modifying~~ **DONE**
-- OS boot screen (similar to pico-8, lethal company, etc) **Halfway Done**
-- ~~favicon~~
+- ~~OS boot screen (similar to pico-8, lethal company, etc)~~ **DONE** (press any key to skip, disabled when `anim` is false)
+- ~~Icon~~ **DONE** (`favicon.svg`)
 - bug fixes
-  1. Animation breaks if another command is sent while it's animating text
-  2. Sound Improvements
-  3. Tab Autocomplete (@n3dhir already had added this but due to the rework, I have to add it again)
-  4. Limit text/Infinitly long background
+  1. ~~Animation breaks if another command is sent while it's animating text~~ **DONE** (output is queued)
+  2. ~~Sound Improvements~~ **DONE** (single audio context, click-free beeps, error tone)
+  3. ~~Tab Autocomplete~~ **DONE** (commands, paths, fonts & colors)
+  4. ~~Limit text/Infinitly long background~~ **DONE** (long lines wrap, scrollback is capped, background stays fixed)
   5. ~~Arrow Keys not bring history back properly~~ thanks @n3dhir!
 
 # /cover

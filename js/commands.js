@@ -1,235 +1,326 @@
-async function fetchBody(json) {
-  const root = document.querySelector(":root");
-  const input = document.getElementById("terminal");
+function createTerminal(json) {
+  const root = document.documentElement;
+  const terminal = document.querySelector(".terminal");
   const output = document.getElementById("output");
-  input.focus();
+  const input = document.getElementById("terminal");
+  const promptEl = document.getElementById("prompt");
 
-  const fonts = json.config.fonts;
-  const help = json.config.help.join("\n");
-  let animationEnabled = json.config.anim;
-  let soundEnabled = json.config.sound;
-  let search = json.website;
+  const { config, website } = json;
+  const maxEntries = config.scrollback ?? 200;
+  let animationEnabled = config.anim;
+  let soundEnabled = config.sound;
 
-  const color = json.config.color;
-  const changeTerminalColor = (newColor) => {
-    root.style.setProperty("--color", newColor);
+  // ---------- sound ----------
+  let audioContext;
+  const beep = (frequency = 440, duration = 0.08) => {
+    if (!soundEnabled) return;
+    audioContext ??= new (window.AudioContext || window.webkitAudioContext)();
+    audioContext.resume();
+    const now = audioContext.currentTime;
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.value = frequency;
+    // Short fade-out avoids the "click" of cutting the wave off abruptly
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    oscillator.connect(gain).connect(audioContext.destination);
+    oscillator.start(now);
+    oscillator.stop(now + duration);
   };
-  changeTerminalColor(color);
+  const errorBeep = () => beep(160, 0.15);
 
-  let previousInputs = [""];
-  let numberInputs = 0;
+  // ---------- output ----------
+  // Everything printed goes through one queue so animations never overlap.
+  const queue = [];
+  let flushing = false;
+  let generation = 0; // bumped by cls to cancel queued/running output
 
-  const handleArrowKeys = () => {
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-        e.preventDefault();
-        if (e.key === "ArrowUp" && numberInputs > 0) {
-          numberInputs -= 1;
-        } else if (
-          e.key === "ArrowDown" &&
-          numberInputs < previousInputs.length - 1
-        ) {
-          numberInputs += 1;
-        }
-        input.value = previousInputs[numberInputs] || "";
-        input.setSelectionRange(input.value.length, input.value.length);
+  const scrollToBottom = () => {
+    terminal.scrollTop = terminal.scrollHeight;
+  };
+
+  // content may be a string or a Promise<string> (e.g. a file being fetched)
+  const print = (content, className) => {
+    queue.push({ content, className });
+    if (!flushing) flush();
+  };
+
+  const flush = async () => {
+    flushing = true;
+    while (queue.length) {
+      const gen = generation;
+      const { content, className } = queue.shift();
+      const text = String((await content) ?? "");
+      if (gen !== generation) continue;
+
+      const line = document.createElement("pre");
+      if (className) line.className = className;
+      output.appendChild(line);
+      while (output.childElementCount > maxEntries) {
+        output.firstElementChild.remove();
       }
-    });
-  };
 
-  const handleClickOutside = (event) => {
-    if (!event.target.matches("#terminal")) {
-      input.focus();
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (soundEnabled) playKeyboardSound();
-
-      if (input.value) {
-        previousInputs = [
-          ...previousInputs.slice(0, numberInputs + 1),
-          input.value,
-        ];
-        numberInputs = previousInputs.length - 1;
-        processCommand(input.value);
-        input.value = previousInputs[numberInputs];
-        input.value = "";
-      }
-    }
-  };
-
-  const processCommand = (command) => {
-    const trimmedCommand = command.trim().toLowerCase();
-    const commandHandlers = {
-      font: (params) => changeTerminalFont(params),
-      color: (params) => colorCommands(params),
-      help: () => addToOutput(help),
-      anim: () => {
-        animationEnabled = !animationEnabled;
-        addToOutput(
-          animationEnabled ? "Text is animated." : "Text is no longer animated."
-        );
-      },
-      fx: () => {
-        soundEnabled = !soundEnabled;
-        addToOutput(
-          soundEnabled ? "Sound effects unmuted." : "Sound effects muted."
-        );
-      },
-      cls: () => clearOutput(),
-      hello: () => addToOutput(`${input.value} world!`),
-      cd: (params) => {
-        if (params === "") {
-          search = json.website;
-          document.getElementById("prompt").textContent = `/`;
-        }
-        const path = params.split(" ").filter(Boolean);
-        let currentSearch = search;
-
-        for (let i = 0; i < path.length; i++) {
-          const key = path[i];
-          if (currentSearch.hasOwnProperty(key)) {
-            currentSearch = currentSearch[key];
-            if (typeof currentSearch === "object") {
-              document.getElementById("prompt").textContent = `/${key}`;
-              addToOutput(`/${key}`);
-            } else {
-              addToOutput(currentSearch);
-              return;
-            }
-          } else {
-            addToOutput(`Directory not found: ${key}`);
-            return;
-          }
-        }
-
-        search = currentSearch;
-      },
-      ls: () => addToOutput(Object.keys(search).join("  ")),
-    };
-
-    const commandKeys = Object.keys(commandHandlers);
-
-    const matchingCommand = commandKeys.find((key) =>
-      trimmedCommand.startsWith(key)
-    );
-
-    if (matchingCommand) {
-      const params = trimmedCommand.slice(matchingCommand.length).trim();
-      commandHandlers[matchingCommand](params);
-    } else if (search.hasOwnProperty(trimmedCommand)) {
-      const value = search[trimmedCommand];
-      if (typeof value === "object") {
-        search = value;
-        document.getElementById("prompt").textContent = `/${trimmedCommand}`;
-        addToOutput(`/${trimmedCommand}`);
-      } else if (typeof value === "string" && value.includes(".txt")) {
-        loadAndDisplayFile(trimmedCommand);
+      if (animationEnabled && text && className !== "cmd") {
+        await typeInto(line, text, gen);
       } else {
-        addToOutput(value);
+        line.textContent = text || " ";
       }
+      scrollToBottom();
+    }
+    flushing = false;
+  };
+
+  const typeInto = (line, text, gen) =>
+    new Promise((resolve) => {
+      const node = line.appendChild(document.createTextNode(""));
+      // At least 4 chars per frame, and never longer than ~45 frames
+      const step = Math.max(4, Math.ceil(text.length / 45));
+      let i = 0;
+      const tick = () => {
+        if (gen !== generation) return resolve();
+        node.appendData(text.slice(i, (i += step)));
+        scrollToBottom();
+        if (i < text.length) requestAnimationFrame(tick);
+        else resolve();
+      };
+      requestAnimationFrame(tick);
+    });
+
+  // ---------- filesystem ----------
+  let path = [];
+  const dirAt = (p) => p.reduce((dir, key) => dir[key], website);
+  const cwd = () => dirAt(path);
+  const isDir = (value) => typeof value === "object" && value !== null;
+  const findKey = (dir, name) =>
+    Object.keys(dir).find((key) => key.toLowerCase() === name.toLowerCase());
+
+  const setPath = (p) => {
+    path = p;
+    promptEl.textContent = `/${path.join("/")}`;
+  };
+
+  // Accepts "a b", "a/b", "/a", "..", etc.
+  const resolve = (target) => {
+    const p = target.trim().startsWith("/") ? [] : [...path];
+    for (const segment of target.split(/[\s/]+/).filter(Boolean)) {
+      if (segment === "..") {
+        p.pop();
+        continue;
+      }
+      if (segment === ".") continue;
+      const dir = dirAt(p);
+      const key = findKey(dir, segment);
+      if (key === undefined) return { missing: segment };
+      if (!isDir(dir[key])) return { path: p, leaf: dir[key] };
+      p.push(key);
+    }
+    return { path: p };
+  };
+
+  const fileCache = new Map();
+  const loadFile = (name) => {
+    if (!fileCache.has(name)) {
+      const request = fetch(`files/${encodeURI(name)}`)
+        .then((res) => (res.ok ? res.text() : Promise.reject(res.status)))
+        .catch(() => {
+          fileCache.delete(name);
+          errorBeep();
+          return `Error loading file: ${name}`;
+        });
+      fileCache.set(name, request);
+    }
+    return fileCache.get(name);
+  };
+
+  const open = (value) => {
+    if (typeof value === "string" && /\.txt$/i.test(value)) {
+      print(loadFile(value), "raw");
     } else {
-      addToOutput("Command not found: " + trimmedCommand);
+      print(value);
     }
   };
 
-  const addToOutput = (text) => {
-    const outputElement = document.createElement("pre");
-    outputElement.textContent = text || " ";
-    if (animationEnabled) {
-      animateText(text, output);
-    } else {
-      output.appendChild(outputElement);
-      output.scrollTop = output.scrollHeight;
+  const cd = (target) => {
+    if (!target.trim()) return setPath([]);
+    const result = resolve(target);
+    if (result.missing) {
+      errorBeep();
+      return print(`Directory not found: ${result.missing}`);
     }
+    if ("leaf" in result) return open(result.leaf);
+    setPath(result.path);
+    print(promptEl.textContent);
   };
 
-  const animateText = (text, output) => {
-    let currentIndex = 0;
-    const currentLine = document.createElement("pre");
-    output.appendChild(currentLine);
+  // ---------- commands ----------
+  const setColor = (color) => root.style.setProperty("--color", color);
 
-    const intervalId = setInterval(() => {
-      currentLine.textContent += text[currentIndex];
-      if (currentIndex === text.length - 1) {
-        output.appendChild(document.createElement("pre"));
-        clearInterval(intervalId);
-        output.scrollTop = output.scrollHeight;
-      }
-      currentIndex++;
-    }, 1);
-  };
-
-  const clearOutput = () => {
-    output.innerHTML = "";
-  };
-
-  const colorCommands = (string) => {
-    const color = string.toLowerCase();
-    if (color === "random" || color === "rand" || color === "ran") {
-      changeTerminalColor(
-        `#${Math.floor(Math.random() * 16777215)
+  const commands = {
+    help: () => print(config.help.join("\n")),
+    echo: (args) => print(args),
+    ls: () => print(Object.keys(cwd()).join("  ")),
+    cd,
+    cls: () => {
+      generation++;
+      queue.length = 0;
+      output.replaceChildren();
+    },
+    color: (args) => {
+      const color = args.toLowerCase();
+      if (["random", "rand", "ran"].includes(color)) {
+        const hex = `#${Math.floor(Math.random() * 0x1000000)
           .toString(16)
-          .padStart(6, "0")}`
+          .padStart(6, "0")}`;
+        setColor(hex);
+        print(`Color changed to: ${hex}`);
+      } else if (["reset", "default"].includes(color)) {
+        setColor(config.color);
+        print("Color was reset.");
+      } else if (color && CSS.supports("color", color)) {
+        setColor(color);
+        print(`Color changed to: ${color}`);
+      } else {
+        errorBeep();
+        print("Invalid color input. Please enter a valid hex code.");
+      }
+    },
+    font: (args) => {
+      const name = args.toLowerCase();
+      const font = config.fonts.find(
+        (f) => f.alias.includes(name) || f.name.toLowerCase() === name
       );
-    } else if (color === "reset" || color === "default" || color === "lime") {
-      changeTerminalColor(color);
-      addToOutput(`Color was reset.`);
-    } else if (isValidColor(string)) {
-      changeTerminalColor(string);
-      addToOutput(`Color changed to: ${string}`);
+      if (font) {
+        root.style.setProperty("--font", font.name);
+        print(`Font changed to ${font.name}.`);
+      } else {
+        errorBeep();
+        print(
+          "Invalid font selected. Available fonts:\n" +
+            config.fonts.map((f) => `  ${f.alias.join(", ")}: ${f.name}`).join("\n")
+        );
+      }
+    },
+    anim: () => {
+      animationEnabled = !animationEnabled;
+      print(animationEnabled ? "Text is animated." : "Text is no longer animated.");
+    },
+    fx: () => {
+      soundEnabled = !soundEnabled;
+      print(soundEnabled ? "Sound effects unmuted." : "Sound effects muted.");
+    },
+  };
+
+  const run = (raw) => {
+    const trimmed = raw.trim();
+    print(`${promptEl.textContent} ${trimmed}`, "cmd");
+    if (!trimmed) return;
+
+    const [, name, args] = trimmed.match(/^(\S+)\s*(.*)$/);
+    const command = name.toLowerCase();
+    if (Object.hasOwn(commands, command)) {
+      commands[command](args);
+    } else if (!resolve(trimmed).missing) {
+      cd(trimmed); // typing a directory/file name directly opens it
     } else {
-      addToOutput("Invalid color input. Please enter a valid hex code.");
+      errorBeep();
+      print(`Command not found: ${name}`);
     }
   };
 
-  const isValidColor = (color) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color);
+  // ---------- tab autocomplete ----------
+  const commonPrefix = (words) =>
+    words.reduce((a, b) => {
+      let i = 0;
+      while (i < a.length && a[i].toLowerCase() === b[i]?.toLowerCase()) i++;
+      return a.slice(0, i);
+    });
 
-  const changeTerminalFont = (string) => {
-    const type = string.toLowerCase();
-    const font = fonts.find((font) =>
-      font.alias.some((alias) => type.includes(alias))
+  const pathCandidates = (target) => {
+    const result = resolve(target);
+    if (result.missing || "leaf" in result) return [];
+    const dir = dirAt(result.path);
+    return Object.keys(dir).map((key) => [key, isDir(dir[key]) ? "/" : " "]);
+  };
+
+  const complete = () => {
+    const value = input.value;
+    const words = value.trimStart().split(/\s+/);
+    const partial = words.pop();
+    const slash = partial.lastIndexOf("/");
+    const stem = partial.slice(slash + 1);
+    const first = words[0]?.toLowerCase();
+
+    let candidates;
+    if (!words.length && slash === -1) {
+      candidates = [
+        ...Object.keys(commands).map((c) => [c, " "]),
+        ...pathCandidates(""),
+      ];
+    } else if (first === "cd" || !Object.hasOwn(commands, first ?? "")) {
+      const base = [...words.slice(first === "cd" ? 1 : 0), partial.slice(0, slash + 1)];
+      candidates = pathCandidates(base.join(" "));
+    } else if (first === "font" && words.length === 1) {
+      candidates = config.fonts.flatMap((f) => f.alias.map((a) => [a, " "]));
+    } else if (first === "color" && words.length === 1) {
+      candidates = [["random", " "], ["reset", " "]];
+    } else {
+      candidates = [];
+    }
+
+    const matches = candidates.filter(([c]) =>
+      c.toLowerCase().startsWith(stem.toLowerCase())
     );
-
-    if (font) {
-      root.style.setProperty("--font", font.name);
-      addToOutput(`Font changed to ${font.name}.`);
+    const head = value.slice(0, value.length - stem.length);
+    if (!matches.length) return errorBeep();
+    if (matches.length === 1) {
+      input.value = head + matches[0][0] + matches[0][1];
+      return;
+    }
+    const prefix = commonPrefix(matches.map(([c]) => c));
+    if (prefix.length > stem.length) {
+      input.value = head + prefix;
     } else {
-      addToOutput("Invalid font selected.");
+      print(`${promptEl.textContent} ${value}`, "cmd");
+      print([...new Set(matches.map(([c]) => c))].join("  "));
     }
   };
 
-  const loadAndDisplayFile = (filename) => {
-    const tryLoadFile = async (file) => {
-      const response = await fetch(`files/${file}`);
-      return await (response.ok
-        ? response.text()
-        : Promise.reject(`Error loading file: ${file}`));
-    };
+  // ---------- input ----------
+  const history = [];
+  let historyIndex = 0;
 
-    tryLoadFile(filename)
-      .then((content) => addToOutput(content))
-      .catch(() => {
-        tryLoadFile(`${filename}.txt`)
-          .then((content) => addToOutput(content))
-          .catch((error) => addToOutput(`Error loading file: ${error}`));
-      });
-  };
+  input.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "Enter": {
+        e.preventDefault();
+        beep();
+        const raw = input.value;
+        input.value = "";
+        if (raw.trim() && history.at(-1) !== raw) history.push(raw);
+        historyIndex = history.length;
+        run(raw);
+        break;
+      }
+      case "ArrowUp":
+      case "ArrowDown":
+        e.preventDefault();
+        historyIndex += e.key === "ArrowUp" ? -1 : 1;
+        historyIndex = Math.max(0, Math.min(historyIndex, history.length));
+        input.value = history[historyIndex] ?? "";
+        input.setSelectionRange(input.value.length, input.value.length);
+        break;
+      case "Tab":
+        e.preventDefault();
+        complete();
+        break;
+    }
+  });
 
-  document.addEventListener("click", handleClickOutside);
-  input.addEventListener("keydown", handleKeyDown);
-  handleArrowKeys();
-}
+  // Refocus the input on click, unless the user is selecting text to copy
+  document.addEventListener("click", (e) => {
+    if (e.target !== input && !window.getSelection().toString()) input.focus();
+  });
 
-function playKeyboardSound() {
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioContext.createOscillator();
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
-  oscillator.connect(audioContext.destination);
-  oscillator.start();
-  oscillator.stop(audioContext.currentTime + 0.1);
+  input.focus();
 }
